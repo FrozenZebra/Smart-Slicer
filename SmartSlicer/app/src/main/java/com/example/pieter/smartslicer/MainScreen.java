@@ -1,17 +1,27 @@
 package com.example.pieter.smartslicer;
 
 import com.example.pieter.smartslicer.util.SystemUiHider;
+import com.example.pieter.smartslicer.util.MediaSaver;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -45,6 +55,8 @@ public class MainScreen extends Activity {
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+
+    private Uri fileUri;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -121,6 +133,9 @@ public class MainScreen extends Activity {
 
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        fileUri = MediaSaver.getOutputMediaFileUri( MediaSaver.MEDIA_TYPE_IMAGE, this );
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
@@ -141,7 +156,7 @@ public class MainScreen extends Activity {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
-                Toast.makeText(this, "Image Captured!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Image Captured to file: \n" + fileUri, Toast.LENGTH_LONG).show();
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Capture was canceled!", Toast.LENGTH_LONG).show();
             } else {
